@@ -7,7 +7,7 @@ export const userLoginSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, {message: "Username can only contain letters, numbers, and underscores"})
     .optional(),
 
-    email: z.email({message: "Invalid email address"}).string().optional(),
+    email: z.string().email({message: "Invalid email address"}).optional(),
 
     password: z.string()
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
@@ -22,7 +22,7 @@ export const userRegisterSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, {message: "Username can only contain letters, numbers, and underscores"})
     .optional(),
 
-    email: z.email({message: "Invalid email address"}).string().optional(),
+    email: z.string().email({message: "Invalid email address"}).optional(),
 
     password: z.string()
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
