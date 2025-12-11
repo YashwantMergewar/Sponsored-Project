@@ -33,3 +33,17 @@ export const userRegisterSchema = z.object({
     {message: "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character"})
 
 })
+
+export const userPasswordSchema = z.object({
+    oldPassword: z.string()
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    {message: "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character"}),
+
+    newPassword: z.string()
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    {message: "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character"}),
+
+    confirmPassword: z.string()
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    {message: "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character"}),
+})
