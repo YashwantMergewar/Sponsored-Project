@@ -24,10 +24,24 @@ const generateAccessAndRefreshToken = async (userId) => {
 }
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { username, email, password, confirmPassword, role } = req.body
+    const { Fullname, username, email, password, confirmPassword } = req.body
+
+    if(Fullname && Fullname.trim() === ''){
+        return res.status(401).json({
+            message: "Fullname is required..!"
+        })
+    }
 
     if(!username && !email){
         return res.status(401).json({message: "username or email is required..!"})
+    }
+
+    const [existingUsers] = await conn.query('select * from users where username = ? or email = ?', [username, email])
+
+    if(existingUsers.length > 0){
+        return res.status(409).json({
+            message: "User with given username or email already exists..!"
+        })
     }
 
     if(!password){
@@ -42,13 +56,13 @@ const registerUser = asyncHandler(async (req, res) => {
         return res.status(400).json({message: "Password and Confirm Password do not match..!"})
     }
 
-    if(role !== 'user' && role !== 'admin'){
+    if(role !== 'admin'){
         return res.status(400).json({
             message: "Invalid role specified..!"
         })
     }
 
-    const user = userRegisterSchema.parse({username, email, password, confirmPassword})
+    const user = userRegisterSchema.parse({Fullname, username, email, password, confirmPassword})
 
     if(!user){
         return res.status(400).json({message: "Invalid user data..!"})
@@ -58,7 +72,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hashSync(password, salt)
     // Save user to DB logic here
-    await conn.query('insert into users (username, password_hash, email, role) values (?, ?, ?, ?)', [username, hashedPassword, email, role])
+    await conn.query('insert into users (fullname, username, password_hash, email, role) values (?, ?, ?, ?, ?)', [Fullname, username, hashedPassword, email, role])
     return res.status(200).json({
         message: "Registration Successful",
         userId: user.user_id
@@ -115,6 +129,7 @@ const loginUser = asyncHandler(async (req, res) => {
             message: "Login Successful",
             user: {
                 id: user[0].user_id,
+                fullname: user[0].fullname,
                 username: user[0].username,
                 role: user[0].role
             }
@@ -148,8 +163,120 @@ const logOutUser = asyncHandler(async (req, res) => {
   }
 })
 
+const userProfile = asyncHandler(async (req, res) => {
+    const { user_id } = req.user
+
+    const [user] = await conn.query('select fullname, username, email, role from users where user_id = ?', [user_id])
+
+    if(user.length === 0){
+        return res.status(404).json({
+            message: "User not found..!"
+        })
+    }
+
+    return res.status(200).json({
+        message: "User profile fetched successfully",
+        user: user[0]
+    })
+})
+
+const editUserProfile = asyncHandler(async (req, res) => {
+    const { user_id } = req.user
+    const { fullname, username, email } = req.body
+    try {
+        let fields = []
+        let values = []
+        const validatedData = userRegisterSchema.parse({ fullname, username, email })
+        if(!validatedData){
+            return res.status(400).json({
+                message: "invalid data provided..!"
+            })
+        }
+    
+        if(fullname){
+            fields.push("fullname = ?")
+            values.push(fullname)
+        }
+
+        if(username){
+            fields.push("username = ?")
+            values.push(username)
+        }
+
+        if(email){
+            fields.push("email = ?")
+            values.push(email)
+        }
+        
+        values.push(user_id)
+        const sql = `update users set ${fields.join(', ')} where user_id = ?`;
+    
+        const updatedUser = await conn.query(sql, values)
+    
+        if(!updatedUser){
+            return res.status(500).json({
+                message: "Unable to update user profile..!"
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "Unable to update user profile..!"
+        })
+    }
+})
+
+const changeUserPassword = asyncHandler(async (req, res) => {
+    const { user_id } = req.user
+    const { oldPassword, newPassword, confirmPassword } = req.body
+
+    if(!oldPassword || !newPassword || !confirmPassword){
+        return res.status(400).json({
+            message: "All password fields are required..!"
+        })
+    }
+
+    userPasswordSchema.parse({ oldPassword, newPassword, confirmPassword })
+
+    const [user] = await conn.query('select user_id from users where oldPassword = ?', [oldPassword])
+
+    if(user.length === 0){
+        return res.status(401).json({
+            message: "Old password is incorrect..!"
+        })
+    }
+
+    if(user.user_id !== user_id){
+        return res.status(403).json({
+            message: "This password change request is not authorized..!"
+        })
+    }
+
+    if(newPassword !== confirmPassword){
+        return res.status(400).json({
+            message: "New password and confirm password do not match..!"
+        })
+    }
+
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hashSync(newPassword, salt)
+    const updatedPassword = await conn.query('update users set password_hash = ? where user_id = ?', [hashedPassword, user_id])
+
+    if(!updatedPassword){
+        return res.status(500).json({
+            message: "Unable to update password..!"
+        })
+    }
+
+    return res.status(200).json({
+        message: "Password updated successfully..!"
+    })
+})
+
 export{
     registerUser,
     loginUser,
-    logOutUser
+    logOutUser,
+    userProfile,
+    editUserProfile,
+    changeUserPassword
 }
