@@ -7,8 +7,8 @@ username varchar(100) not null,
 password_hash varchar(100) not null unique,
 email varchar(100) not null unique,
 role enum('admin' , 'user') not null,
-voter_id int null,
-foreign key(voter_id) references voter(voter_id) on delete set null
+refreshToken text,
+createdAt timestamp default current_timestamp
 );
 
  
