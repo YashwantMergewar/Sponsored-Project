@@ -16,6 +16,9 @@ export const userLoginSchema = z.object({
 })
 
 export const userRegisterSchema = z.object({
+    fullname: z.string().min(3, {message: "Fullname must be at least 3 characters long"})
+    .regex(/^[a-zA-Z\s]+$/, {message: "Fullname can only contain letters and spaces"}),
+
     username: z.string()
     .min(3, {message: "Username must be at least 3 characters long"})
     .max(30, {message: "Username must be at most 30 characters long"})
@@ -46,4 +49,19 @@ export const userPasswordSchema = z.object({
     confirmPassword: z.string()
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
     {message: "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character"}),
+})
+
+export const updateUserProfileSchema = z.object({
+     fullname: z.string().min(3, {message: "Fullname must be at least 3 characters long"})
+    .regex(/^[a-zA-Z\s]+$/, {message: "Fullname can only contain letters and spaces"})
+    .optional(),
+
+    username: z.string()
+    .min(3, {message: "Username must be at least 3 characters long"})
+    .max(30, {message: "Username must be at most 30 characters long"})
+    .regex(/^[a-zA-Z0-9_]+$/, {message: "Username can only contain letters, numbers, and underscores"})
+    .optional(),
+
+    email: z.string().email({message: "Invalid email address"}).optional(),
+
 })

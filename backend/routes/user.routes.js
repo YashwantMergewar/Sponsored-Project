@@ -8,8 +8,8 @@ const router = Router();
 router.route('/login').post(loginUser);
 router.route('/register').post(registerUser);
 router.route('/logout').post(verifyJWT, logOutUser);
-router.route('/profile').get(verifyJWT, userProfile)
-router.route('/profile').patch(verifyJWT, editUserProfile);
-router.route('/change-password').patch(verifyJWT, changeUserPassword);
+router.route('/profile/:user_id').get(verifyJWT, userProfile)
+router.route('/profile/:user_id').patch(verifyJWT, editUserProfile);
+router.route('/change-password/:user_id').patch(verifyJWT, changeUserPassword);
 
 export default router;

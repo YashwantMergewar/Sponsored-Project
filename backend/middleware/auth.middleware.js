@@ -33,7 +33,8 @@ export const verifyJWT = asyncHandler(async (req, res, next)=>{
             })
         }
     
-        req.user = user
+        // store the user object (first row) on the request for convenience
+        req.user = user && user[0]
         next();
     } catch (error) {
         console.log(error);
