@@ -158,11 +158,16 @@ const logOutUser = asyncHandler(async (req, res) => {
 })
 
 const userProfile = asyncHandler(async (req, res) => {
-    const { user_id } = req.params || req.user
+    // Prefer route param, otherwise fall back to the authenticated user from verifyJWT
+    const user_id = req.params?.user_id || req.user?.user_id;
+
+    if(!user_id){
+        return res.status(400).json({ message: 'user_id is required' })
+    }
 
     const [user] = await conn.query('select fullname, username, email, role from users where user_id = ?', [user_id])
 
-    if(user.length === 0){
+    if(!user || user.length === 0){
         return res.status(404).json({
             message: "User not found..!"
         })
@@ -175,7 +180,7 @@ const userProfile = asyncHandler(async (req, res) => {
 })
 
 const editUserProfile = asyncHandler(async (req, res) => {
-    const { user_id } = req.params || req.user
+    const user_id = req.params?.user_id || req.user?.user_id;
     const { fullname, username, email } = req.body
     try {
         let fields = []
