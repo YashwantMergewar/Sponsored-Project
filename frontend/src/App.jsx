@@ -3,6 +3,9 @@ import './App.css'
 import AppLayout from './app-layout.jsx'
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
+import ProfilePage from './pages/ProfilePage';
+import ProtectedRoute from './components/ProtectedRoute';
+import RegisterVoterPage from './pages/RegisterVoterPage';
 
 const router = createBrowserRouter([
   {
@@ -13,27 +16,22 @@ const router = createBrowserRouter([
         element: <LandingPage />
       },
       {
-        path: '/home',
-        element: <div>Home Page</div>
-      },
-      {
         path: '/auth',
         element: <AuthPage />
       },
       {
         path: '/register-voter',
-        element: <div>Register voter Page</div>
+        element:<ProtectedRoute><RegisterVoterPage /></ProtectedRoute>
       },
       {
         path: '/profile',
-        element: <div>Profile Page</div>
+        element: <ProtectedRoute><ProfilePage /></ProtectedRoute>
       }
     ]
   }
 ])
 
 function App() {
-
   return (
     <RouterProvider router={router} />
   )

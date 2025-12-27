@@ -10,14 +10,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useAuth } from '@/context/AuthProvider';
+import { useAuth } from '@/context/AuthContext';
 
 const AuthPage = () => {
   const [loading, setLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const { fetchUser } = useAuth()
   const [error, setError] = useState("");
   let navigate = useNavigate()
@@ -65,7 +67,7 @@ const AuthPage = () => {
         console.log(res.user);
 
         setSignInData({ username: "", email: "", password: "" });
-        navigate("/home")
+        navigate("/profile")
         toast.success("Wecome to Admin Dashboard")
         } catch (err) {
             console.log(err.message);
@@ -105,7 +107,7 @@ const AuthPage = () => {
           </TabsList>
 
           <TabsContent value="SignIn">
-            <Card>
+            <Card className="w-90">
               <CardHeader>
                 <CardTitle>SignIn</CardTitle>
                 <CardDescription>
@@ -138,20 +140,32 @@ const AuthPage = () => {
                 </div>
                 <div className="grid gap-3">
                   <Label htmlFor="signin-password">Password</Label>
-                  <Input
-                    type="password"
-                    id="signin-password"
-                    name="password"
-                    placeholder="Enter your Password"
-                    value={signInData.password}
-                    onChange={handleOnChange}
-                    disabled={loading}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      type={passwordVisible? "text" : "password"}
+                      id="signin-password"
+                      name="password"
+                      placeholder="Enter your Password"
+                      value={signInData.password}
+                      onChange={handleOnChange}
+                      disabled={loading}
+                      required
+                      className="pr-10"
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setPasswordVisible(!passwordVisible)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors"
+                      disabled={loading}
+                      tabIndex={-1}
+                    >
+                      {passwordVisible? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
               </CardContent>
               <div className="flex justify-center items-center">
-                <Button type="submit" className="w-2xs" disabled={loading}>
+                <Button type="submit" className="w-2xs cursor-pointer" disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {loading ? "Logging into account..." : "SignIn"}    
                 </Button>
@@ -160,7 +174,7 @@ const AuthPage = () => {
           </TabsContent>
 
           <TabsContent value="SignUp">
-            <Card>
+            <Card className="w-90">
               <CardHeader>
                 <CardTitle>Create Account</CardTitle>
                 <CardDescription>
@@ -204,31 +218,55 @@ const AuthPage = () => {
                 </div>
                 <div className="grid gap-3">
                   <Label htmlFor="password">Password</Label>
-                  <Input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter your Password"
-                    onChange={handleOnChange}
-                    value={data.password}
-                    disabled={loading}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={passwordVisible? "text":"password"}
+                      id="password"
+                      name="password"
+                      placeholder="Enter your Password"
+                      onChange={handleOnChange}
+                      value={data.password}
+                      disabled={loading}
+                      className="pr-10"
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setPasswordVisible(!passwordVisible)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors"
+                      disabled={loading}
+                      tabIndex={-1}
+                    >
+                      {passwordVisible? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
                 <div className="grid gap-3">
                   <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <Input
-                    type="password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    placeholder="Enter your Password Again"
-                    onChange={handleOnChange}
-                    value={data.confirmPassword}
-                    disabled={loading}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={confirmPasswordVisible? "text" : "password"}
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      placeholder="Enter your Password Again"
+                      onChange={handleOnChange}
+                      value={data.confirmPassword}
+                      disabled={loading}
+                      className="pr-10"
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors"
+                      disabled={loading}
+                      tabIndex={-1}
+                    >
+                      {confirmPasswordVisible? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
               </CardContent>
               <div className="flex justify-center items-center">
-                <Button type="submit" className="w-2xs" disabled={loading}>
+                <Button type="submit" className="w-2xs cursor-pointer" disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {loading ? "Creating Account..." : "Create Account"}    
                 </Button>

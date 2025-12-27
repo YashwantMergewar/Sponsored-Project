@@ -1,21 +1,29 @@
-import {useContext, useEffect, useState, useCallback} from "react"
+import {useEffect, useState, useCallback} from "react"
 import { AuthContext } from "./AuthContext";
 import api from "@/api/setupAxios";
 import { toast } from "sonner";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 //   const navigate = useNavigate()
 
   const fetchUser = useCallback(async () => {
+    setAuthLoading(true);
     try {
       const { data } = await api.get('/users/profile');
-      setUser(data.user);
+      const fetchedUser = data?.user ?? null;
+      setUser(fetchedUser);
+      console.log(user);
+      setIsAuthenticated(Boolean(fetchedUser));
     } catch (err) {
+      console.error('Failed to fetch user profile:', err);
       setUser(null);
+      setIsAuthenticated(false);
     } finally {
-      setLoading(false);
+      setAuthLoading(false);
     }
   }, []);
 
@@ -27,7 +35,8 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.post('/users/logout');
       setUser(null);
-      toast.success("Logged Out..!")
+      setIsAuthenticated(false);
+      toast.success("Logged Out..!");
     //   navigate('/auth');
 
     } catch (err) {
@@ -36,10 +45,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, fetchUser, setUser, logout }}>
+    <AuthContext.Provider value={{ user, fetchUser, setUser, logout, isAuthenticated, authLoading, setIsAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);

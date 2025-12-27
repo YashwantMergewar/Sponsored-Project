@@ -1,40 +1,33 @@
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, LogOut, UserPen, KeyRound } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/context/AuthProvider";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated, authLoading } = useAuth();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const navigate = useNavigate()
   const toggleNavbar = () => {
     setMobileDrawerOpen(!mobileDrawerOpen);
   };
+  console.log("isAuthenticated: ", isAuthenticated);
+  if(authLoading){
+   return null
+  }
   const navItems = [
-    { label: "Home", to: "/home" },
+    { label: "Register", to: "/register-voter" },
     { label: "About", to: "#" },
-    { label: "Contact", to: "#" },
   ];
   return (
     <nav className="sticky top-0 z-50 py-3 backdrop-blur-lg border-hidden border-neutral-700/80">
       <div className="container px-4 mx-auto relative text-sm pb-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center shrink-0">
-            {user?.role === "admin" ? (
-              <Link to="/home">
+            <Link to="/">
                 <span className="text-xl tracking-tight bg-violet-800 rounded-4xl p-2 pb-3 text-white hover:text-violet-800 hover:bg-white hover:border-2 shadow-[0_20px_35px_-10px_rgba(124,58,237,0.65)] transition-all duration-300 ease-out hover:shadow-[0_12px_25px_-10px_rgba(124,58,237,0.55)] hover:translate-y-1 active:translate-y-2 active:shadow-[0_8px_15px_-8px_rgba(124,58,237,0.45)]">
                   Mahagoan Connect
                 </span>
               </Link>
-            ) : (
-              <Link to="/">
-                <span className="text-xl tracking-tight bg-violet-800 rounded-4xl p-2 pb-3 text-white hover:text-violet-800 hover:bg-white hover:border-2 shadow-[0_20px_35px_-10px_rgba(124,58,237,0.65)] transition-all duration-300 ease-out hover:shadow-[0_12px_25px_-10px_rgba(124,58,237,0.55)] hover:translate-y-1 active:translate-y-2 active:shadow-[0_8px_15px_-8px_rgba(124,58,237,0.45)]">
-                  Mahagoan Connect
-                </span>
-              </Link>
-            )}
           </div>
           <ul className="hidden lg:flex ml-14 space-x-12">
             {navItems.map((item, index) => (
@@ -58,20 +51,33 @@ const Navbar = () => {
             ))}
           </ul>
           <div className="hidden lg:flex justify-center space-x-12 items-center">
-            {user?.role === "admin" ? (
+            {isAuthenticated ? (
               <div className="flex">
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild className="mr-6 mt-2">
-                  <User />
+                  <DropdownMenuTrigger asChild>
+                  <User className="mr-6 mt-2 cursor-pointer"/>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuLabel className="hover:bg-violet-800 hover:text-white rounded-xl" onClick={navigate("/profile")}>Profile</DropdownMenuLabel>
-                    <DropdownMenuLabel className="hover:bg-violet-800 hover:text-white rounded-xl">Change Password</DropdownMenuLabel>
-                    <DropdownMenuLabel className="hover:bg-red-800 hover:text-white rounded-xl" onClick={logout}>Logout</DropdownMenuLabel>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile" className="flex w-full  items-center rounded-md px-3 py-2 text-sm cursor-pointer data-highlighted:bg-violet-800 data-highlighted:text-white focus:bg-violet-800 focus:text-white outline-none">
+                      <UserPen color="black"/>
+                      Profile
+                     </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/change-password" className="flex w-full items-center rounded-md px-3 py-2 text-sm cursor-pointer data-highlighted:bg-violet-800 data-highlighted:text-white focus:bg-violet-800 focus:text-white outline-none">
+                      <KeyRound color="black"/>
+                      Change Password
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={logout} className="cursor-pointer rounded-md px-3 py-2 text-sm
+                   data-highlighted:bg-red-800 data-highlighted:text-white focus:bg-red-800 focus:text-white outline-none">
+                      <LogOut color="black"/>
+                    Logout
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-
-                {/* <Button onClick={logout}>Logout</Button> */}
               </div>
             ) : (
               <>
@@ -112,19 +118,28 @@ const Navbar = () => {
               ))}
             </ul>
             <div className="flex space-x-6 mt-8">
-              {user?.role === "admin" ? (
+              {isAuthenticated ? (
                 <div className="flex flex-col">
-                  <Link
-                    to="/profile"
-                    title="Profile"
-                    className="flex items-center mb-3 py-2 px-6 rounded-md hover:text-white hover:bg-black"
-                  >
-                    <User />
-                  </Link>
-
-                  <Button className="ml-2" onClick={logout}>
-                    Logout
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <User className="cursor-pointer"/>
+                    </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile" className="flex w-full  items-center rounded-md px-3 py-2 text-sm cursor-pointer data-highlighted:bg-violet-800 data-highlighted:text-white focus:bg-violet-800 focus:text-white outline-none">
+                      Profile
+                     </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/change-password" className="flex w-full items-center rounded-md px-3 py-2 text-sm cursor-pointer data-highlighted:bg-violet-800 data-highlighted:text-white focus:bg-violet-800 focus:text-white outline-none">
+                      Change Password
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={logout} className="cursor-pointer rounded-md px-3 py-2 text-sm
+                   data-highlighted:bg-red-800 data-highlighted:text-white focus:bg-red-800 focus:text-white outline-none">Logout</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 </div>
               ) : (
                 <>
