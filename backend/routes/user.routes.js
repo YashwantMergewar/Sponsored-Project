@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middleware/auth.middleware.js";
-import { loginUser, logOutUser, registerUser } from "../controllers/user.controller.js";
+import { deleteUser, loginUser, logOutUser, registerUser } from "../controllers/user.controller.js";
 import { userProfile, editUserProfile, changeUserPassword } from "../controllers/user.controller.js";
 
 
@@ -12,5 +12,6 @@ router.route('/logout').post(verifyJWT, logOutUser);
 router.route('/profile').get(verifyJWT, userProfile)
 router.route('/profile/:user_id').patch(verifyJWT, editUserProfile);
 router.route('/change-password/:user_id').patch(verifyJWT, changeUserPassword);
+router.route('/delete-user').delete(verifyJWT, deleteUser);
 
 export default router;

@@ -6,6 +6,8 @@ import AuthPage from './pages/AuthPage';
 import ProfilePage from './pages/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import RegisterVoterPage from './pages/RegisterVoterPage';
+import Dashboard from './pages/Dashboard';
+import VoterProfile from './pages/VoterProfile';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +28,18 @@ const router = createBrowserRouter([
       {
         path: '/profile',
         element: <ProtectedRoute><ProfilePage /></ProtectedRoute>
+      },
+      {
+        path: '/voter/dashboard',
+        element: <ProtectedRoute><Dashboard /></ProtectedRoute>
+      },
+      {
+        path: '/about',
+        element: <h1>This is About Page</h1>
+      },
+      {
+        path: '/voter/profile',
+        element: <ProtectedRoute><VoterProfile /></ProtectedRoute>
       }
     ]
   }

@@ -4,11 +4,13 @@ import { voterRegistrationSchema, voterUpdateSchema } from "../utils/validationS
 
 const voterRegistration = asyncHandler(async (req, res) => {
     const validateData = voterRegistrationSchema.safeParse(req.body)
+
     
     if(validateData.success === false){
+        console.log(validateData.error.message);
         return res.status(400).json({
-            message: "Invalid data provided..!",
-            errors: validateData.error?.format?.() || validateData.error
+            message:  validateData.error?.issues[0].message || "Invalid data provided..!",
+            errors: validateData.error?.format?.()
         })
     }
 

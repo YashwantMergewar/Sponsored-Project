@@ -1,11 +1,11 @@
 import { Menu, X, User, LogOut, UserPen, KeyRound } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 const Navbar = () => {
-  const { user, logout, isAuthenticated, authLoading } = useAuth();
+  const { logout, isAuthenticated, authLoading } = useAuth();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const toggleNavbar = () => {
     setMobileDrawerOpen(!mobileDrawerOpen);
@@ -16,7 +16,8 @@ const Navbar = () => {
   }
   const navItems = [
     { label: "Register", to: "/register-voter" },
-    { label: "About", to: "#" },
+    { label: "Dashboard", to: "/voter/dashboard" },
+    { label: "About", to: "/about" },
   ];
   return (
     <nav className="sticky top-0 z-50 py-3 backdrop-blur-lg border-hidden border-neutral-700/80">
@@ -29,27 +30,37 @@ const Navbar = () => {
                 </span>
               </Link>
           </div>
-          <ul className="hidden lg:flex ml-14 space-x-12">
+          { isAuthenticated ?
+            <ul className="hidden lg:flex ml-14 space-x-12">
             {navItems.map((item, index) => (
               <li key={index}>
-                {user?.role === "admin" ? (
-                  <Link
-                    className="hover:bg-violet-800 transition delay-75 duration-75 hover:text-white py-2 px-3 border-hidden rounded-md"
-                    to={item.to}
-                  >
-                    {item.label}
-                  </Link>
-                ) : (
-                  <Link
-                    className="hover:bg-violet-800  transition delay-75 duration-75 hover:text-white py-2 px-3 border-hidden rounded-md"
-                    to={item.to}
-                  >
-                    {item.label} {/* display another buttons */}
-                  </Link>
-                )}
+                <NavLink
+                  end
+                  to={item.to}
+                  className={({ isActive }) => `hover:bg-violet-800 transition delay-75 duration-75 hover:text-white py-2 px-3 border-hidden rounded-md ${isActive && item.to !== '#' ? 'underline underline-offset-4 decoration-violet-800 decoration-4' : ''}`}
+                >
+                  {item.label}
+                </NavLink>
               </li>
             ))}
-          </ul>
+          </ul> : 
+            <ul className="hidden lg:flex ml-14 space-x-12">
+              <li>
+                <NavLink
+                  to="/"
+                  className={({ isActive }) => `hover:bg-violet-800 transition delay-75 duration-75 hover:text-white py-2 px-3 border-hidden rounded-md ${isActive && window.location.href !== '#' ? 'underline underline-offset-4 decoration-violet-800 decoration-4' : ''}`}
+                >
+                  Home
+                </NavLink>
+                <NavLink
+                  to="/about"
+                  className={({ isActive }) => `hover:bg-violet-800 transition delay-75 duration-75 hover:text-white py-2 px-3 border-hidden rounded-md ${isActive && window.location.href !== '#' ? 'underline underline-offset-4 decoration-violet-800 decoration-4' : ''}`}
+                >
+                  About
+                </NavLink>
+              </li>
+            </ul>
+          }
           <div className="hidden lg:flex justify-center space-x-12 items-center">
             {isAuthenticated ? (
               <div className="flex">
@@ -103,21 +114,43 @@ const Navbar = () => {
             </button>
           </div>
         </div>
+
+
         {mobileDrawerOpen && (
-          <div className="fixed right-0 mt-4 w-full p-12 flex flex-col justify-evenly items-center lg:hidden z-50 bg-white/90 backdrop-blur-xl shadow-2xl border border-white/20 rounded-2xl border-hidden">
-            <ul>
-              {navItems.map((item, index) => (
-                <li className="flex" key={index}>
-                  <Link
-                    className="hover:bg-violet-800 transition delay-75 duration-75 hover:text-white py-2 px-3 border-hidden rounded-md"
+          <div className="fixed left-0 top-16 w-full p-6 flex flex-col items-start gap-4 lg:hidden z-50 bg-white/95 backdrop-blur-xl shadow-2xl border border-white/20 rounded-2xl">
+              
+            <ul className="w-full flex flex-col items-start gap-3 text-gray-900">
+              {isAuthenticated ?
+              navItems.map((item, index) => (
+                <li className="w-full" key={index}>
+                  <NavLink
+                    end
                     to={item.to}
+                    className={({ isActive }) => `w-full text-left hover:bg-violet-800 transition delay-75 duration-75 hover:text-white py-2 px-3 border-hidden rounded-md ${isActive && item.to !== '#' ? 'underline underline-offset-4 decoration-violet-800 decoration-4' : ''}`}
                   >
                     {item.label}
-                  </Link>
+                  </NavLink>
                 </li>
-              ))}
+              )) : 
+              <li className="flex flex-col items-center w-full gap-2">
+                <NavLink
+                  end
+                  to="/"
+                  className={({ isActive }) => `text-center hover:bg-violet-800 transition delay-75 duration-75 hover:text-white py-2 px-3 border-hidden rounded-md ${isActive ? 'underline underline-offset-4 decoration-violet-800 decoration-4' : ''}`}
+                >
+                  Home
+                </NavLink>
+                <NavLink
+                  end
+                  to="/about"
+                  className={({ isActive }) => `text-center hover:bg-violet-800 transition delay-75 duration-75 hover:text-white py-2 px-3 border-hidden rounded-md ${isActive ? 'underline underline-offset-4 decoration-violet-800 decoration-4' : ''}`}
+                >
+                  About
+                </NavLink>
+              </li>
+              }
             </ul>
-            <div className="flex space-x-6 mt-8">
+            <div className="flex space-x-6 items-center justify-center mt-4 w-full">
               {isAuthenticated ? (
                 <div className="flex flex-col">
                   <DropdownMenu>

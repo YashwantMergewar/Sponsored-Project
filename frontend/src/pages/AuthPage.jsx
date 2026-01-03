@@ -20,7 +20,7 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const { fetchUser } = useAuth()
+  const { fetchUser, isAuthenticated } = useAuth()
   const [error, setError] = useState("");
   let navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("SignIn");
@@ -67,11 +67,12 @@ const AuthPage = () => {
         console.log(res.user);
 
         setSignInData({ username: "", email: "", password: "" });
-        navigate("/profile")
-        toast.success("Wecome to Admin Dashboard")
+        navigate("/voter/dashboard");
+        toast.success("Welcome to Admin Dashboard")
         } catch (err) {
             console.log(err.message);
-            setError("Failed to access account..!" || err.message);
+            toast.error(err.message)
+            setError(err.message || "Failed to access account..!");
         } finally {
             setLoading(false);
         }
@@ -88,8 +89,10 @@ const AuthPage = () => {
       const res = await createUser(data);
       toast.success(res.message);
       setData({ fullname: "", username: "", email: "", password: "", confirmPassword: "" });
+      setActiveTab("SignIn");
       
     } catch (err) {
+      toast.error(err.message)
       setError(err.message || "Failed to create account..!");
     } finally {
       setLoading(false);
@@ -99,7 +102,7 @@ const AuthPage = () => {
   return (
     <div className="flex flex-col items-center mt-6">
       {error && (<div className="mb-4 text-red-600 font-medium">{error}</div>)}
-      <form onSubmit={handleSubmit}>
+      {!isAuthenticated ? <form onSubmit={handleSubmit}>
         <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="SignIn">
           <TabsList>
             <TabsTrigger value="SignIn">SignIn</TabsTrigger>
@@ -116,9 +119,9 @@ const AuthPage = () => {
               </CardHeader>
               <CardContent className="grid gap-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="signin-username">Username</Label>
+                  <Label htmlFor="username">Username</Label>
                   <Input
-                    id="signin-username"
+                    id="username"
                     name="username"
                     placeholder="Enter your Username"
                     value={signInData.username}
@@ -128,9 +131,9 @@ const AuthPage = () => {
                 </div>
                 <span className="-mt-3 -mb-3 underline">OR</span>
                 <div className="grid gap-3">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
-                    id="signin-email"
+                    id="email"
                     name="email"
                     placeholder="Enter your Email"
                     value={signInData.email}
@@ -139,11 +142,11 @@ const AuthPage = () => {
                   />
                 </div>
                 <div className="grid gap-3">
-                  <Label htmlFor="signin-password">Password</Label>
+                  <Label htmlFor="password">Password</Label>
                   <div className="relative">
                     <Input
                       type={passwordVisible? "text" : "password"}
-                      id="signin-password"
+                      id="password"
                       name="password"
                       placeholder="Enter your Password"
                       value={signInData.password}
@@ -274,7 +277,17 @@ const AuthPage = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </form>
+      </form>   : 
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">You are already logged in</h1>
+          <p className="text-gray-600">Redirecting to dashboard...</p>
+          {setTimeout(() => {
+            navigate("/voter/dashboard")
+          })}
+        </div>
+      </div>
+      }
     </div>
   );
 };

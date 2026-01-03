@@ -284,11 +284,37 @@ const changeUserPassword = asyncHandler(async (req, res) => {
     })
 })
 
+const deleteUser = async (req, res) => {
+    const user_id = req.params.user_id || req.user?.user_id
+    try {
+        const result = await conn.query('delete from users where user_id = ?', [user_id])
+        if(result.affectedRows === 0){
+            return res.status(404).json({
+                message: "User not found..!"
+            })
+        }
+        if(!result){
+            return res.status(500).json({
+                message: "Unable to delete user..!"
+            })
+        }
+
+        return res.status(200).json({
+            message: "User deleted successfully..!"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "Unable to delete user..!"
+        })
+    }
+}
+
 export{
     registerUser,
     loginUser,
     logOutUser,
     userProfile,
     editUserProfile,
-    changeUserPassword
+    changeUserPassword,
+    deleteUser
 }
