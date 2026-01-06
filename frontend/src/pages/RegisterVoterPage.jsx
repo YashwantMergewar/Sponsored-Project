@@ -71,6 +71,23 @@ const RegisterVoterPage = () => {
     });
   };
 
+  const handleOnCancel = () => {
+    setData({
+        fullname: "",
+        email: "",
+        head_of_family: "",
+        mobile_no: "",
+        aadhar_no: "",
+        dob: null,
+        age: "",
+        prabhag_no: "",
+        house_no: "",
+        religion: "",
+        caste: "",
+        category: ""
+      });
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -181,7 +198,7 @@ const RegisterVoterPage = () => {
                     required
                   />
                 </Field>
-                <div className="flex flex-row gap-4">
+                <div className="flex flex-col md:flex-row gap-4">
                   <Field>
                     <FieldLabel htmlFor="mobile">Mobile</FieldLabel>
                     <Input
@@ -207,7 +224,7 @@ const RegisterVoterPage = () => {
                   </Field>
                 </div>
 
-                <div className="flex flex-row gap-3">
+                <div className="flex flex-col md:flex-row gap-3">
                   <Field>
                     <FieldLabel htmlFor="dob">Date of Birth</FieldLabel>
                     <Popover open={open} onOpenChange={setOpen}>
@@ -216,7 +233,7 @@ const RegisterVoterPage = () => {
                           variant="outline"
                           id="dob"
                           name="dob"
-                          className="w-62 justify-between font-normal cursor-pointer"
+                          className="w-full md:w-48 justify-between font-normal cursor-pointer"
                         >
                           {data.dob
                             ? format(data.dob, "dd-MM-yyyy")
@@ -254,7 +271,7 @@ const RegisterVoterPage = () => {
                       id="age"
                       placeholder="Select date of birth to calculate age"
                       name="age"
-                      className="w-32"
+                      className="w-full md:w-32"
                       disabled={!data.dob}
                       value={data.age}
                       readOnly
@@ -271,7 +288,7 @@ const RegisterVoterPage = () => {
                   are accurate to avoid any issues with voter registration.
                 </FieldDescription>
                 <FieldSeparator />
-                <div className="space-y-4 flex flex-row gap-4">
+                <div className="space-y-4 flex flex-col md:flex-row gap-4 md:space-y-0">
                   <Field>
                     <FieldLabel htmlFor="prabhagNo">Prabhag No.</FieldLabel>
                     <Input
@@ -305,7 +322,7 @@ const RegisterVoterPage = () => {
                   used for constituency classification.
                 </FieldDescription>
                 <FieldSeparator />
-                <div className="space-y-4 flex flex-row gap-4">
+                <div className="space-y-4 flex flex-col md:flex-row gap-4 md:space-y-0">
                   <Field>
                     <FieldLabel htmlFor="religion">Religion</FieldLabel>
                     <Select
@@ -401,7 +418,7 @@ const RegisterVoterPage = () => {
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {loading ? "Submitting Details..." : "Submit Details"}
             </Button>
-            <Button variant="outline" type="button" className="cursor-pointer">
+            <Button onClick={handleOnCancel} variant="outline" type="button" className="cursor-pointer">
               Cancel
             </Button>
           </Field>

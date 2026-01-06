@@ -120,4 +120,37 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Responsive helpers */
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* helper class to ensure tables scroll smoothly on small screens */
+  .responsive-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Allow table cells to wrap on small viewports inside responsive tables */
+  .responsive-table th,
+  .responsive-table td {
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  /* make form groups stack cleanly by default when using container queries */
+  .stack-sm\:md-flex-row {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@layer utilities {
+  /* utility to show a full-width clickable area on small screens */
+  .w-full-md {
+    @apply w-full md:w-auto;
+  }
 }

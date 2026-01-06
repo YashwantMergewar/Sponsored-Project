@@ -41,9 +41,36 @@ const deleteUser = async () => {
     }
 }
 
+const updateUser = async (data) => {
+    try {
+        const res = await api.patch('/users/profile/update-user', data);
+        return res.data;
+    } catch (error) {
+        if (error?.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        console.log(error.response);
+        throw new Error(error.message || 'Profile updation failed');
+    }
+}
+
+const changeUserPassword = async (data) => {
+    try {
+        const res = await api.patch('/users/change-password', data)
+        res.data;
+    } catch (error) {
+        if (error?.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw new Error(error.message || 'Profile updation failed');
+    }
+}
+
 export {
     createUser,
     loginUser,
-    deleteUser
+    deleteUser,
+    updateUser,
+    changeUserPassword
 
 }

@@ -76,7 +76,7 @@ const Navbar = () => {
                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/change-password" className="flex w-full items-center rounded-md px-3 py-2 text-sm cursor-pointer data-highlighted:bg-violet-800 data-highlighted:text-white focus:bg-violet-800 focus:text-white outline-none">
+                      <Link to="/user/change-password" className="flex w-full items-center rounded-md px-3 py-2 text-sm cursor-pointer data-highlighted:bg-violet-800 data-highlighted:text-white focus:bg-violet-800 focus:text-white outline-none">
                       <KeyRound color="black"/>
                       Change Password
                       </Link>
@@ -109,7 +109,7 @@ const Navbar = () => {
           </div>
 
           <div className="lg:hidden md:flex flex-col justify-end">
-            <button onClick={toggleNavbar}>
+            <button onClick={toggleNavbar} aria-label={mobileDrawerOpen ? "Close menu" : "Open menu"} aria-expanded={mobileDrawerOpen} aria-controls="mobile-menu">
               {mobileDrawerOpen ? <X /> : <Menu />}
             </button>
           </div>
@@ -117,7 +117,7 @@ const Navbar = () => {
 
 
         {mobileDrawerOpen && (
-          <div className="fixed left-0 top-16 w-full p-6 flex flex-col items-start gap-4 lg:hidden z-50 bg-white/95 backdrop-blur-xl shadow-2xl border border-white/20 rounded-2xl">
+          <div id="mobile-menu" role="dialog" aria-modal="true" className="fixed left-0 top-16 w-full p-6 sm:px-6 flex flex-col items-start gap-4 lg:hidden z-50 bg-white/95 backdrop-blur-xl shadow-2xl border border-white/20 rounded-2xl">
               
             <ul className="w-full flex flex-col items-start gap-3 text-gray-900">
               {isAuthenticated ?

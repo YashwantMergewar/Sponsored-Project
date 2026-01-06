@@ -180,15 +180,21 @@ const userProfile = asyncHandler(async (req, res) => {
 })
 
 const editUserProfile = asyncHandler(async (req, res) => {
-    const user_id = req.params?.user_id || req.user?.user_id;
+    const user_id =  req.user?.user_id || req.params?.user_id;
+    if(user_id === undefined || user_id === null){
+        console.log("Id not found...");
+    }
+
     const { fullname, username, email } = req.body
     try {
         let fields = []
         let values = []
-        const validatedData = updateUserProfileSchema.parse({ fullname, username, email })
-        if(!validatedData){
+        // validate safely and return errors as 400 instead of throwing
+        const validatedData = updateUserProfileSchema.safeParse({ fullname, username, email })
+        if(!validatedData.success){
             return res.status(400).json({
-                message: "invalid data provided..!"
+                message: "Invalid data provided..!",
+                errors: validatedData.error?.format?.() || validatedData.error
             })
         }
     
@@ -205,6 +211,13 @@ const editUserProfile = asyncHandler(async (req, res) => {
         if(email){
             fields.push("email = ?")
             values.push(email)
+        }
+
+        // prevent running an invalid UPDATE with no SET clauses
+        if (fields.length === 0) {
+            return res.status(400).json({
+                message: "No valid fields provided for update..!"
+            })
         }
         
         values.push(user_id)
@@ -235,7 +248,7 @@ const editUserProfile = asyncHandler(async (req, res) => {
 
 const changeUserPassword = asyncHandler(async (req, res) => {
     // route param or the authenticated user's id (from middleware)
-    const user_id = Number(req.params?.user_id ?? req.user?.user_id)
+    const user_id = Number(req.user?.user_id ?? req.params?.user_id)
     const { oldPassword, newPassword, confirmPassword } = req.body
 
     if(!oldPassword || !newPassword || !confirmPassword){

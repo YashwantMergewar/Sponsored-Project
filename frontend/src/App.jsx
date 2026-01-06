@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import RegisterVoterPage from './pages/RegisterVoterPage';
 import Dashboard from './pages/Dashboard';
 import VoterProfile from './pages/VoterProfile';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 
 const router = createBrowserRouter([
   {
@@ -34,11 +35,15 @@ const router = createBrowserRouter([
         element: <ProtectedRoute><Dashboard /></ProtectedRoute>
       },
       {
+        path: '/user/change-password',
+        element: <ProtectedRoute><ChangePasswordPage /></ProtectedRoute>
+      },
+      {
         path: '/about',
         element: <h1>This is About Page</h1>
       },
       {
-        path: '/voter/profile',
+        path: '/voter/profile/:voterId',
         element: <ProtectedRoute><VoterProfile /></ProtectedRoute>
       }
     ]

@@ -9,9 +9,9 @@ router.route('/login').post(loginUser);
 router.route('/register').post(registerUser);
 router.route('/logout').post(verifyJWT, logOutUser);
 // Allow fetching current user via cookie (no param) or by id
-router.route('/profile').get(verifyJWT, userProfile)
-router.route('/profile/:user_id').patch(verifyJWT, editUserProfile);
-router.route('/change-password/:user_id').patch(verifyJWT, changeUserPassword);
+router.route('/profile').get(verifyJWT, userProfile);
+router.route('/profile/update-user').patch(verifyJWT, editUserProfile);
+router.route('/change-password/').patch(verifyJWT, changeUserPassword);
 router.route('/delete-user').delete(verifyJWT, deleteUser);
 
 export default router;
