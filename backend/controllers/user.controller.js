@@ -40,7 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     if(existingUsers.length > 0){
         return res.status(409).json({
-            message: "User with given username or email already exists..!"
+            message: "User with given username or email already exists..! You can't create account..!"
         })
     }
 
@@ -60,6 +60,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
     if(!user){
         return res.status(400).json({message: "Invalid user data..!"})
+    }
+
+    const [result] = await conn.query('select * from users');
+    if(result.length > 0){
+        return res.status(401).json({
+            message: "Not Allow to create account..! Another user has a role of admin"
+        })
     }
 
     // Hash the password before saving
