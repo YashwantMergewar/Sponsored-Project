@@ -191,7 +191,7 @@ const AuthPage = () => {
                   <Input
                     id="fullname"
                     name="fullname"
-                    placeholder="Enter your Username"
+                    placeholder="Enter your Fullname"
                     onChange={handleOnChange}
                     value={data.fullname}
                     disabled={loading}
@@ -202,7 +202,7 @@ const AuthPage = () => {
                   <Input
                     id="username"
                     name="username"
-                    placeholder="Enter your Password"
+                    placeholder="Enter your Username"
                     onChange={handleOnChange}
                     value={data.username}
                     disabled={loading}
