@@ -7,13 +7,13 @@ const AppLayout = () => {
     <div>
         <Navbar />
         
-        <main className="min-h-screen pt-20 sm:pt-24">
+        <main className="min-h-screen sm:pt-10">
             <Outlet />
         </main>
         <Toaster />
 
-        <div className="p-10 mt-8 text-center bg-neutral-900 text-white rounded-2xl border-0">
-            &copy; 2024 Voter Registration Platform, Mahagao
+        <div className="bottom-0 w-full h-80 flex items-center justify-center bg-neutral-900 text-white">
+            <span>&copy; 2024 Voter Registration Platform, Mahagao</span>
         </div>
         
     </div>
