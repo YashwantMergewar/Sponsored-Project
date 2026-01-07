@@ -12,7 +12,7 @@ const AppLayout = () => {
         </main>
         <Toaster />
 
-        <div className="bottom-0 w-full h-80 flex items-center justify-center bg-neutral-900 text-white">
+        <div className="bottom-0 w-full mt-20 h-80 flex items-center justify-center bg-neutral-900 text-white">
             <span>&copy; 2024 Voter Registration Platform, Mahagao</span>
         </div>
         
