@@ -117,8 +117,8 @@ const loginUser = asyncHandler(async (req, res) => {
         const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user[0].user_id)
         const option = {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: true,
+            sameSite: "none",
             maxAge: 60 * 60 * 1000 
         }
 
