@@ -40,7 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     if(existingUsers.length > 0){
         return res.status(409).json({
-            message: "User with given username or email already exists..!"
+            message: "User with given username or email already exists..! You can't create account..!"
         })
     }
 
@@ -60,6 +60,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
     if(!user){
         return res.status(400).json({message: "Invalid user data..!"})
+    }
+
+    const [result] = await conn.query('select * from users');
+    if(result.length > 0){
+        return res.status(401).json({
+            message: "Not Allow to create account..! Another user has a role of admin"
+        })
     }
 
     // Hash the password before saving
@@ -166,11 +173,16 @@ const logOutUser = asyncHandler(async (req, res) => {
 })
 
 const userProfile = asyncHandler(async (req, res) => {
-    const { user_id } = req.params || req.user
+    // Prefer route param, otherwise fall back to the authenticated user from verifyJWT
+    const user_id = req.params?.user_id || req.user?.user_id;
+
+    if(!user_id){
+        return res.status(400).json({ message: 'user_id is required' })
+    }
 
     const [user] = await conn.query('select fullname, username, email, role from users where user_id = ?', [user_id])
 
-    if(user.length === 0){
+    if(!user || user.length === 0){
         return res.status(404).json({
             message: "User not found..!"
         })
@@ -183,15 +195,21 @@ const userProfile = asyncHandler(async (req, res) => {
 })
 
 const editUserProfile = asyncHandler(async (req, res) => {
-    const { user_id } = req.params || req.user
+    const user_id =  req.user?.user_id || req.params?.user_id;
+    if(user_id === undefined || user_id === null){
+        console.log("Id not found...");
+    }
+
     const { fullname, username, email } = req.body
     try {
         let fields = []
         let values = []
-        const validatedData = updateUserProfileSchema.parse({ fullname, username, email })
-        if(!validatedData){
+        // validate safely and return errors as 400 instead of throwing
+        const validatedData = updateUserProfileSchema.safeParse({ fullname, username, email })
+        if(!validatedData.success){
             return res.status(400).json({
-                message: "invalid data provided..!"
+                message: "Invalid data provided..!",
+                errors: validatedData.error?.format?.() || validatedData.error
             })
         }
     
@@ -208,6 +226,13 @@ const editUserProfile = asyncHandler(async (req, res) => {
         if(email){
             fields.push("email = ?")
             values.push(email)
+        }
+
+        // prevent running an invalid UPDATE with no SET clauses
+        if (fields.length === 0) {
+            return res.status(400).json({
+                message: "No valid fields provided for update..!"
+            })
         }
         
         values.push(user_id)
@@ -238,7 +263,7 @@ const editUserProfile = asyncHandler(async (req, res) => {
 
 const changeUserPassword = asyncHandler(async (req, res) => {
     // route param or the authenticated user's id (from middleware)
-    const user_id = Number(req.params?.user_id ?? req.user?.user_id)
+    const user_id = Number(req.user?.user_id ?? req.params?.user_id)
     const { oldPassword, newPassword, confirmPassword } = req.body
 
     if(!oldPassword || !newPassword || !confirmPassword){
@@ -287,11 +312,37 @@ const changeUserPassword = asyncHandler(async (req, res) => {
     })
 })
 
+const deleteUser = async (req, res) => {
+    const user_id = req.params.user_id || req.user?.user_id
+    try {
+        const result = await conn.query('delete from users where user_id = ?', [user_id])
+        if(result.affectedRows === 0){
+            return res.status(404).json({
+                message: "User not found..!"
+            })
+        }
+        if(!result){
+            return res.status(500).json({
+                message: "Unable to delete user..!"
+            })
+        }
+
+        return res.status(200).json({
+            message: "User deleted successfully..!"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "Unable to delete user..!"
+        })
+    }
+}
+
 export{
     registerUser,
     loginUser,
     logOutUser,
     userProfile,
     editUserProfile,
-    changeUserPassword
+    changeUserPassword,
+    deleteUser
 }

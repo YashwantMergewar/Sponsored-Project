@@ -4,11 +4,13 @@ import { voterRegistrationSchema, voterUpdateSchema } from "../utils/validationS
 
 const voterRegistration = asyncHandler(async (req, res) => {
     const validateData = voterRegistrationSchema.safeParse(req.body)
+
     
     if(validateData.success === false){
+        console.log(validateData.error.message);
         return res.status(400).json({
-            message: "Invalid data provided..!",
-            errors: validateData.error?.format?.() || validateData.error
+            message:  validateData.error?.issues[0].message || "Invalid data provided..!",
+            errors: validateData.error?.format?.()
         })
     }
 
@@ -63,6 +65,7 @@ const updateVoter = asyncHandler(async (req, res) => {
 
     try {
         if(!validateData.success){
+            console.log(validateData.error)
             return res.status(400).json({
                 message: "Invalid data provided..!",
                 errors: validateData.error?.format?.() || validateData.error
@@ -140,9 +143,26 @@ const deleteVoter = asyncHandler(async (req, res) => {
     })
 })
 
+const getVoterById = asyncHandler(async (req, res) => {
+    const { voter_id } = req.params
+    const [result] = await conn.query('select * from voters where voter_id = ?', [voter_id]);
+
+    if(result.length === 0){
+        return res.status(404).json({
+            message: "No voters found..!"
+        })
+    }
+
+    return res.status(200).json({
+        message: "Voters fetched successfully..!",
+        voters: result
+    })
+})
+
 export {
     voterRegistration,
     getVoters,
     updateVoter,
-    deleteVoter
+    deleteVoter,
+    getVoterById
 }
