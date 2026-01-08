@@ -115,10 +115,11 @@ const loginUser = asyncHandler(async (req, res) => {
         }
         
         const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user[0].user_id)
+        const isProd = process.env.NODE_ENV === "production";
         const option = {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
+            secure: isProd,
+            sameSite: isProd ? "None" : "lax",
             maxAge: 60 * 60 * 1000 
         }
 
@@ -150,8 +151,15 @@ const logOutUser = asyncHandler(async (req, res) => {
   try {
       const { user_id } = req.user
       // Logout user logic here
-      res.clearCookie("accessToken")
-      res.clearCookie("refreshToken")
+      const isProd = process.env.NODE_ENV === "production";
+      const option = {
+            httpOnly: true,
+            secure: isProd,
+            sameSite: isProd ? "None" : "lax",
+            maxAge: 60 * 60 * 1000 
+        }
+      res.clearCookie("accessToken", option);
+      res.clearCookie("refreshToken", option);
       // remove refresh token from DB
       await conn.query('update users set refreshToken = null where user_id = ?', [user_id])
       return res.status(200).json({
