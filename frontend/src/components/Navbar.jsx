@@ -164,7 +164,7 @@ const Navbar = () => {
                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/change-password" className="flex w-full items-center rounded-md px-3 py-2 text-sm cursor-pointer data-highlighted:bg-violet-800 data-highlighted:text-white focus:bg-violet-800 focus:text-white outline-none">
+                      <Link to="/user/change-password" className="flex w-full items-center rounded-md px-3 py-2 text-sm cursor-pointer data-highlighted:bg-violet-800 data-highlighted:text-white focus:bg-violet-800 focus:text-white outline-none">
                       Change Password
                       </Link>
                     </DropdownMenuItem>
