@@ -11,8 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from '@/context/AuthContext';
 
@@ -22,8 +22,18 @@ const AuthPage = () => {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const { fetchUser, isAuthenticated } = useAuth()
   const [error, setError] = useState("");
+  const [searchParams]  = useSearchParams();
   let navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("SignIn");
+  const tabFromUrl = searchParams.get("tab");
+  useEffect(() => {
+    if(tabFromUrl === "signin"){
+        setActiveTab("SignIn");
+    }else{
+      setActiveTab("SignUp")
+    }
+  }, [tabFromUrl])
+
   const [signInData, setSignInData] = useState({
     username: "",
     email: "",
