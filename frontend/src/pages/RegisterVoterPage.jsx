@@ -324,6 +324,28 @@ const RegisterVoterPage = () => {
                 <FieldSeparator />
                 <div className="space-y-4 flex flex-col md:flex-row gap-4 md:space-y-0">
                   <Field>
+                    <FieldLabel htmlFor="category">Category</FieldLabel>
+                    <Select
+                      id="category"
+                      name="category"
+                      value={data.category}
+                      onValueChange={(value) =>
+                        setData({ ...data, category: value })
+                      }
+                    >
+                      <SelectTrigger className="cursor-pointer">
+                        <SelectValue placeholder="Select your category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="General">General</SelectItem>
+                        <SelectItem value="OBC">OBC</SelectItem>
+                        <SelectItem value="SC">SC</SelectItem>
+                        <SelectItem value="ST">ST</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+
+                  <Field>
                     <FieldLabel htmlFor="religion">Religion</FieldLabel>
                     <Select
                       id="religion"
@@ -379,30 +401,6 @@ const RegisterVoterPage = () => {
                         <SelectItem value="Jungam">Jungam</SelectItem>
                         <SelectItem value="Wani">Wani</SelectItem>
                         <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="category">Category</FieldLabel>
-                    <Select
-                      id="category"
-                      name="category"
-                      value={data.category}
-                      onValueChange={(value) =>
-                        setData({ ...data, category: value })
-                      }
-                    >
-                      <SelectTrigger className="cursor-pointer">
-                        <SelectValue placeholder="Select your category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="General">General</SelectItem>
-                        <SelectItem value="OBC">OBC</SelectItem>
-                        <SelectItem value="SC">SC</SelectItem>
-                        <SelectItem value="ST">ST</SelectItem>
-                        <SelectItem value="EWS">EWS</SelectItem>
-                        <SelectItem value="VJNT">VJNT</SelectItem>
                       </SelectContent>
                     </Select>
                   </Field>

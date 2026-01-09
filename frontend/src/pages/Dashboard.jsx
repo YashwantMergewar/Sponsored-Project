@@ -121,7 +121,7 @@ const Dashboard = () => {
         setLoading(true);
         const voterData = await getAllVoterDetails();
         const formattedVoters = Array.isArray(voterData.voters)
-          ? voterData.voters.map((v) => ({ ...v, dob: formatDOB(v.dob) }))
+          ? voterData.voters.map((v) => ({ ...v, dob: formatDOB(v.dob) }))  
           : voterData.voters;
         setVoters(formattedVoters);
       } catch (error) {
@@ -196,6 +196,14 @@ const Dashboard = () => {
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
                 className="cursor-pointer rounded-md px-3 py-2 text-sm
+                   data-highlighted:bg-violet-800 data-highlighted:text-white focus:bg-violet-800 focus:text-white outline-none"
+                onClick={() => navigate(`/voter/profile/${voter.voter_id}`)}
+              >
+                View Voter Details
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="cursor-pointer rounded-md px-3 py-2 text-sm
                    data-highlighted:bg-red-800 data-highlighted:text-white focus:bg-red-800 focus:text-white outline-none"
                 onClick={() => {
                   setSelectedVoterId(voter.voter_id);
@@ -203,14 +211,6 @@ const Dashboard = () => {
                 }}
               >
                 Delete Voter Details
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer rounded-md px-3 py-2 text-sm
-                   data-highlighted:bg-violet-800 data-highlighted:text-white focus:bg-violet-800 focus:text-white outline-none"
-                onClick={() => navigate(`/voter/profile/${voter.voter_id}`)}
-              >
-                View Voter Details
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
