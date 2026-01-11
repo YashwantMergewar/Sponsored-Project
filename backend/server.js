@@ -5,7 +5,13 @@ import cookieParser from 'cookie-parser';
 import userRoutes from './routes/user.routes.js'
 import voterRoutes from './routes/voter.route.js'
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+
+}));
 app.use(cookieParser());
 
 

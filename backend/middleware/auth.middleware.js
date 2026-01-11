@@ -38,7 +38,7 @@ export const verifyJWT = asyncHandler(async (req, res, next)=>{
         next();
     } catch (error) {
         console.log(error);
-        return res.status(401).json({message: error.message || "Unauthorized request..!"});
+        return res.status(401).json({message: "Unauthorized request..! Need to login" || error.message });
     }
 })
 

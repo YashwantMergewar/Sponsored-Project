@@ -9,9 +9,9 @@ export const voterRegistrationSchema = z.object({
     email: z.string().email({message: "Invalid email address"}),
 
     head_of_family: z.string()
-    .min(3, "Fullname must be at least 3 characters long")
+    .min(3, "Name must be at least 3 characters long")
     .max(100, "Fullname must be at most 100 charcters long")
-    .regex(/^[a-zA-Z\s]+$/, {message: "Fullname can only contain letters and spaces"}),
+    .regex(/^[a-zA-Z\s]+$/, {message: "Name can only contain letters and spaces"}),
 
     mobile_no: z.string()
     .trim()
@@ -49,11 +49,11 @@ export const voterRegistrationSchema = z.object({
 
     caste: z.string()
     .min(3, "Caste must be at least 3 characters long")
-    .max(100, "Caste must be at most 100 characters long"),
+    .max(10, "Caste must be at most 10 characters long"),
 
     category: z.string()
-    .min(3, "Category must be at least 3 characters long")
-    .max(50, "Category must be at most 50 characters long"),
+    .min(2, "Category must be at least 2 characters long")
+    .max(10, "Category must be at most 10 characters long"),
 
     prabhag_no: z.number({
         required_error: "Prabhag number is required",
