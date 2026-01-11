@@ -23,6 +23,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { voterUpdateSchema } from "@/validationSchema/voterConstraintsSchema";
 
 const VoterProfile = () => {
   const { isAuthenticated, user } = useAuth();
@@ -85,8 +86,8 @@ const VoterProfile = () => {
         const n = Number(payload.age);
         if (!Number.isNaN(n)) payload.age = n;
       }
-
-      await updateVoter(voterId, payload);
+      const validaPayload = voterUpdateSchema(payload)
+      await updateVoter(voterId, validaPayload);
       toast.success("Voter updated successfully");
       const res = await getVoterById(voterId);
       const fetched = Array.isArray(res?.voters) ? res.voters[0] : res?.voters;
@@ -95,7 +96,7 @@ const VoterProfile = () => {
       setEditField(null);
     } catch (error) {
       console.error(error);
-      toast.error(error.message || "Failed to update voter");
+      toast.error(error.issues?.[0]?.message || error.message || "Failed to update voter");
     } finally {
       setLoading(false);
     }

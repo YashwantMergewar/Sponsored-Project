@@ -11,10 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from '@/context/AuthContext';
+import { userLoginSchema, userRegisterSchema } from "@/validationSchema/userConstraintsSchema";
 
 const AuthPage = () => {
   const [loading, setLoading] = useState(false);
@@ -22,8 +23,18 @@ const AuthPage = () => {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const { fetchUser, isAuthenticated } = useAuth()
   const [error, setError] = useState("");
+  const [searchParams]  = useSearchParams();
   let navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("SignIn");
+  const tabFromUrl = searchParams.get("tab");
+  useEffect(() => {
+    if(tabFromUrl === "signin"){
+        setActiveTab("SignIn");
+    }else{
+      setActiveTab("SignUp")
+    }
+  }, [tabFromUrl])
+
   const [signInData, setSignInData] = useState({
     username: "",
     email: "",
@@ -62,7 +73,9 @@ const AuthPage = () => {
             setError("Enter either Username or Email to access account..!")
         }
 
-        const res = await loginUser(signInData)
+        const validateData = userLoginSchema.parse(signInData)
+
+        const res = await loginUser(validateData)
         await fetchUser()
         console.log(res.user);
 
@@ -71,8 +84,9 @@ const AuthPage = () => {
         toast.success("Welcome to Admin Dashboard")
         } catch (err) {
             console.log(err.message);
-            toast.error(err.message)
-            setError(err.message || "Failed to access account..!");
+            const message = err.issues?.[0]?.message || err?.response?.data?.message;
+            toast.error(message || err.message)
+            setError(message || err.message || "Failed to access account..!");
         } finally {
             setLoading(false);
         }
@@ -86,14 +100,16 @@ const AuthPage = () => {
 
     try {
       setLoading(true);
-      const res = await createUser(data);
+      const validData = userRegisterSchema.parse(data)
+      const res = await createUser(validData);
       toast.success(res.message);
       setData({ fullname: "", username: "", email: "", password: "", confirmPassword: "" });
       setActiveTab("SignIn");
       
     } catch (err) {
-      toast.error(err.message)
-      setError(err.message || "Failed to create account..!");
+      const message = err.issues?.[0]?.message || err?.response?.data?.message;
+      toast.error(message || err.message)
+      setError(message || err.message || "Failed to access account..!");
     } finally {
       setLoading(false);
     }
@@ -195,6 +211,7 @@ const AuthPage = () => {
                     onChange={handleOnChange}
                     value={data.fullname}
                     disabled={loading}
+                    required
                   />
                 </div>
                 <div className="grid gap-3">
@@ -206,6 +223,7 @@ const AuthPage = () => {
                     onChange={handleOnChange}
                     value={data.username}
                     disabled={loading}
+                    required
                   />
                 </div>
                 <div className="grid gap-3">
@@ -217,6 +235,7 @@ const AuthPage = () => {
                     onChange={handleOnChange}
                     value={data.email}
                     disabled={loading}
+                    required
                   />
                 </div>
                 <div className="grid gap-3">
@@ -231,6 +250,7 @@ const AuthPage = () => {
                       value={data.password}
                       disabled={loading}
                       className="pr-10"
+                      required
                     />
                     <button 
                       type="button" 
@@ -255,6 +275,7 @@ const AuthPage = () => {
                       value={data.confirmPassword}
                       disabled={loading}
                       className="pr-10"
+                      required
                     />
                     <button 
                       type="button" 

@@ -93,14 +93,14 @@ const Navbar = () => {
             ) : (
               <>
                 <Link
-                  to="/auth"
+                  to="/auth?tab=signin"
                   className="py-2 px-3 border rounded-md transition delay-75 duration-175 hover:bg-violet-800 hover:text-white"
                 >
                   SignIn
                 </Link>
                 <Link
-                  to="/auth"
-                  className="py-2 px-3 rounded-xl bg-violet-800 text-white shadow-[0_20px_35px_-10px_rgba(124,58,237,0.65)] transition-all duration-300 ease-out hover:shadow-[0_12px_25px_-10px_rgba(124,58,237,0.55)] hover:translate-y-1 active:translate-y-2 active:shadow-[0_8px_15px_-8px_rgba(124,58,237,0.45)]"
+                  to="/auth?tab=signup"
+                  className="py-2 px-3 rounded-xl bg-violet-800 text-white hover:bg-white hover:text-black shadow-[0_20px_35px_-10px_rgba(124,58,237,0.65)] transition-all duration-300 ease-out hover:shadow-[0_12px_25px_-10px_rgba(124,58,237,0.55)] hover:translate-y-1 active:translate-y-2 active:shadow-[0_8px_15px_-8px_rgba(124,58,237,0.45)]"
                 >
                   Create Account
                 </Link>
@@ -184,7 +184,7 @@ const Navbar = () => {
                   </Link>
                   <Link
                     to="/auth"
-                    className="py-2 px-3 rounded-xl bg-violet-800 text-white backdrop-blur-xl shadow-[0_20px_35px_-10px_rgba(124,58,237,0.65)] transition-all duration-300 ease-out hover:shadow-[0_12px_25px_-10px_rgba(124,58,237,0.55)] hover:translate-y-1 active:translate-y-2 active:shadow-[0_8px_15px_-8px_rgba(124,58,237,0.45)]"
+                    className="py-2 px-3 rounded-xl bg-violet-800 text-white hover:bg-white hover:text-black backdrop-blur-xl shadow-[0_20px_35px_-10px_rgba(124,58,237,0.65)] transition-all duration-300 ease-out hover:shadow-[0_12px_25px_-10px_rgba(124,58,237,0.55)] hover:translate-y-1 active:translate-y-2 active:shadow-[0_8px_15px_-8px_rgba(124,58,237,0.45)]"
                   >
                     Create Account
                   </Link>

@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/context/AuthContext";
+import { voterRegistrationSchema } from "@/validationSchema/voterConstraintsSchema";
 import { format } from "date-fns";
 import { Calendar1Icon, Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -115,7 +116,9 @@ const RegisterVoterPage = () => {
         prabhag_no: prabhagNumber,
       };
 
-      const voter = await registerVoter(submittedData);
+      const validData = voterRegistrationSchema(submittedData)
+
+      const voter = await registerVoter(validData);
       setData({
         fullname: "",
         email: "",
@@ -136,7 +139,7 @@ const RegisterVoterPage = () => {
       navigate("/voter/dashboard");
       toast.success(voter?.message || "Voter registered successfully");
     } catch (error) {
-      toast.error(error.message || "Voter registration failed");
+      toast.error(err?.issues?.[0]?.message || error.message || "Voter registration failed");
       console.log(error.message);
     } finally {
       setLoading(false);
@@ -324,6 +327,28 @@ const RegisterVoterPage = () => {
                 <FieldSeparator />
                 <div className="space-y-4 flex flex-col md:flex-row gap-4 md:space-y-0">
                   <Field>
+                    <FieldLabel htmlFor="category">Category</FieldLabel>
+                    <Select
+                      id="category"
+                      name="category"
+                      value={data.category}
+                      onValueChange={(value) =>
+                        setData({ ...data, category: value })
+                      }
+                    >
+                      <SelectTrigger className="cursor-pointer">
+                        <SelectValue placeholder="Select your category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="General">General</SelectItem>
+                        <SelectItem value="OBC">OBC</SelectItem>
+                        <SelectItem value="SC">SC</SelectItem>
+                        <SelectItem value="ST">ST</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+
+                  <Field>
                     <FieldLabel htmlFor="religion">Religion</FieldLabel>
                     <Select
                       id="religion"
@@ -379,30 +404,6 @@ const RegisterVoterPage = () => {
                         <SelectItem value="Jungam">Jungam</SelectItem>
                         <SelectItem value="Wani">Wani</SelectItem>
                         <SelectItem value="Other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="category">Category</FieldLabel>
-                    <Select
-                      id="category"
-                      name="category"
-                      value={data.category}
-                      onValueChange={(value) =>
-                        setData({ ...data, category: value })
-                      }
-                    >
-                      <SelectTrigger className="cursor-pointer">
-                        <SelectValue placeholder="Select your category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="General">General</SelectItem>
-                        <SelectItem value="OBC">OBC</SelectItem>
-                        <SelectItem value="SC">SC</SelectItem>
-                        <SelectItem value="ST">ST</SelectItem>
-                        <SelectItem value="EWS">EWS</SelectItem>
-                        <SelectItem value="VJNT">VJNT</SelectItem>
                       </SelectContent>
                     </Select>
                   </Field>
