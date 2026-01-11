@@ -113,7 +113,7 @@ const loginUser = asyncHandler(async (req, res) => {
             httpOnly: true,
             secure: isProd,
             sameSite: isProd ? "None" : "lax",
-            maxAge: 60 * 60 * 1000 
+            maxAge: 60 * 60 * 24 * 1000 
         }
 
         res.cookie("accessToken", accessToken, option)
@@ -148,8 +148,7 @@ const logOutUser = asyncHandler(async (req, res) => {
       const option = {
             httpOnly: true,
             secure: isProd,
-            sameSite: isProd ? "None" : "lax",
-            maxAge: 60 * 60 * 1000 
+            sameSite: isProd ? "None" : "lax"
         }
       res.clearCookie("accessToken", option);
       res.clearCookie("refreshToken", option);
