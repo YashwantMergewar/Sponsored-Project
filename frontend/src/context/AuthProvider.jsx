@@ -2,13 +2,14 @@ import {useEffect, useState, useCallback} from "react"
 import { AuthContext } from "./AuthContext";
 import api from "@/api/setupAxios";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   // const [loading, setLoading] = useState(true);
-//   const navigate = useNavigate()
+  const navigate = useNavigate()
 
   const fetchUser = useCallback(async () => {
     setAuthLoading(true);
@@ -36,8 +37,8 @@ export const AuthProvider = ({ children }) => {
       await api.post('/users/logout');
       setUser(null);
       setIsAuthenticated(false);
+      navigate('/auth?tab=signin', {replace: true});
       toast.success("Logged Out..!");
-    //   navigate('/auth');
 
     } catch (err) {
       console.error('Logout failed', err);

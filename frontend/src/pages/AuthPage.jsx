@@ -14,31 +14,36 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
-import { useAuth } from '@/context/AuthContext';
-import { userLoginSchema, userRegisterSchema } from "@/validationSchema/userConstraintsSchema";
+import { useAuth } from "@/context/AuthContext";
+import {
+  userLoginSchema,
+  userRegisterSchema,
+} from "@/validationSchema/userConstraintsSchema";
 
 const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const { fetchUser, isAuthenticated } = useAuth()
+  const { fetchUser, isAuthenticated } = useAuth();
   const [error, setError] = useState("");
-  const [searchParams]  = useSearchParams();
-  let navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams();
+  let navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("SignIn");
   const tabFromUrl = searchParams.get("tab");
   useEffect(() => {
-    if(tabFromUrl === "signin"){
-        setActiveTab("SignIn");
-    }else{
-      setActiveTab("SignUp")
-    }
-  }, [tabFromUrl])
+    if (tabFromUrl === "signin") {
+    setActiveTab("SignIn");
+  } else if (tabFromUrl === "signup") {
+    setActiveTab("SignUp");
+  } else {
+    setActiveTab("SignIn");
+  }
+  }, [tabFromUrl]);
 
   const [signInData, setSignInData] = useState({
     username: "",
     email: "",
-    password: ""
+    password: "",
   });
   const [data, setData] = useState({
     fullname: "",
@@ -49,15 +54,15 @@ const AuthPage = () => {
   });
 
   const handleOnChange = (e) => {
-    if(activeTab === "SignIn"){
-        setSignInData({
-            ...signInData,
-            [e.target.name]: e.target.value
-        })
+    if (activeTab === "SignIn") {
+      setSignInData({
+        ...signInData,
+        [e.target.name]: e.target.value,
+      });
     }
     setData({
       ...data,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -67,30 +72,34 @@ const AuthPage = () => {
 
     // Only run registration when SignUp tab is active
     if (activeTab !== "SignUp") {
-        try {
+      try {
         setLoading(true);
-        if(signInData.username.trim("") === "" && signInData.email.trim("") === ""){
-            setError("Enter either Username or Email to access account..!")
+        if (
+          signInData.username.trim("") === "" &&
+          signInData.email.trim("") === ""
+        ) {
+          setError("Enter either Username or Email to access account..!");
         }
 
-        const validateData = userLoginSchema.parse(signInData)
+        const validateData = userLoginSchema.parse(signInData);
 
-        const res = await loginUser(validateData)
-        await fetchUser()
+        const res = await loginUser(validateData);
+        await fetchUser();
         console.log(res.user);
 
         setSignInData({ username: "", email: "", password: "" });
         navigate("/voter/dashboard");
-        toast.success("Welcome to Admin Dashboard")
-        } catch (err) {
-            console.log(err.message);
-            const message = err.issues?.[0]?.message || err?.response?.data?.message;
-            toast.error(message || err.message)
-            setError(message || err.message || "Failed to access account..!");
-        } finally {
-            setLoading(false);
-        }
-        return
+        toast.success("Welcome to Admin Dashboard");
+      } catch (err) {
+        console.log(err.message);
+        const message =
+          err.issues?.[0]?.message || err?.response?.data?.message;
+        toast.error(message || err.message);
+        setError(message || err.message || "Failed to access account..!");
+      } finally {
+        setLoading(false);
+      }
+      return;
     }
 
     if (data.password !== data.confirmPassword) {
@@ -100,15 +109,20 @@ const AuthPage = () => {
 
     try {
       setLoading(true);
-      const validData = userRegisterSchema.parse(data)
+      const validData = userRegisterSchema.parse(data);
       const res = await createUser(validData);
       toast.success(res.message);
-      setData({ fullname: "", username: "", email: "", password: "", confirmPassword: "" });
+      setData({
+        fullname: "",
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
       setActiveTab("SignIn");
-      
     } catch (err) {
       const message = err.issues?.[0]?.message || err?.response?.data?.message;
-      toast.error(message || err.message)
+      toast.error(message || err.message);
       setError(message || err.message || "Failed to access account..!");
     } finally {
       setLoading(false);
@@ -117,198 +131,236 @@ const AuthPage = () => {
 
   return (
     <div className="flex flex-col items-center mt-6">
-      {error && (<div className="mb-4 text-red-600 font-medium">{error}</div>)}
-      {!isAuthenticated ? <form onSubmit={handleSubmit}>
-        <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="SignIn">
-          <TabsList>
-            <TabsTrigger value="SignIn">SignIn</TabsTrigger>
-            <TabsTrigger value="SignUp">Create Account</TabsTrigger>
-          </TabsList>
+      {error && <div className="mb-4 text-red-600 font-medium">{error}</div>}
+      {!isAuthenticated ? (
+        <form onSubmit={handleSubmit}>
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => {
+              setActiveTab(value);
+              setSearchParams({
+                tab: value === "SignIn" ? "signin" : "signup",
+              });
+            }}
+          >
+            <TabsList>
+              <TabsTrigger value="SignIn">SignIn</TabsTrigger>
+              <TabsTrigger value="SignUp">Create Account</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="SignIn">
-            <Card className="w-90">
-              <CardHeader>
-                <CardTitle>SignIn</CardTitle>
-                <CardDescription>
-                  The Signin authority is only applicable to Admin Only..!
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    name="username"
-                    placeholder="Enter your Username"
-                    value={signInData.username}
-                    onChange={handleOnChange}
-                    disabled={loading}
-                  />
-                </div>
-                <span className="-mt-3 -mb-3 underline">OR</span>
-                <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    placeholder="Enter your Email"
-                    value={signInData.email}
-                    onChange={handleOnChange}
-                    disabled={loading}
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
+            <TabsContent value="SignIn">
+              <Card className="w-90">
+                <CardHeader>
+                  <CardTitle>SignIn</CardTitle>
+                  <CardDescription>
+                    The Signin authority is only applicable to Admin Only..!
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-6">
+                  <div className="grid gap-3">
+                    <Label htmlFor="username">Username</Label>
                     <Input
-                      type={passwordVisible? "text" : "password"}
-                      id="password"
-                      name="password"
-                      placeholder="Enter your Password"
-                      value={signInData.password}
+                      id="username"
+                      name="username"
+                      placeholder="Enter your Username"
+                      value={signInData.username}
                       onChange={handleOnChange}
                       disabled={loading}
-                      required
-                      className="pr-10"
                     />
-                    <button 
-                      type="button" 
-                      onClick={() => setPasswordVisible(!passwordVisible)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors"
-                      disabled={loading}
-                      tabIndex={-1}
-                    >
-                      {passwordVisible? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
                   </div>
+                  <span className="-mt-3 -mb-3 underline">OR</span>
+                  <div className="grid gap-3">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      placeholder="Enter your Email"
+                      value={signInData.email}
+                      onChange={handleOnChange}
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className="grid gap-3">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Input
+                        type={passwordVisible ? "text" : "password"}
+                        id="password"
+                        name="password"
+                        placeholder="Enter your Password"
+                        value={signInData.password}
+                        onChange={handleOnChange}
+                        disabled={loading}
+                        required
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPasswordVisible(!passwordVisible)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors"
+                        disabled={loading}
+                        tabIndex={-1}
+                      >
+                        {passwordVisible ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </CardContent>
+                <div className="flex justify-center items-center">
+                  <Button
+                    type="submit"
+                    className="w-2xs cursor-pointer"
+                    disabled={loading}
+                  >
+                    {loading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    {loading ? "Logging into account..." : "SignIn"}
+                  </Button>
                 </div>
-              </CardContent>
-              <div className="flex justify-center items-center">
-                <Button type="submit" className="w-2xs cursor-pointer" disabled={loading}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {loading ? "Logging into account..." : "SignIn"}    
-                </Button>
-              </div>
-            </Card>
-          </TabsContent>
+              </Card>
+            </TabsContent>
 
-          <TabsContent value="SignUp">
-            <Card className="w-90">
-              <CardHeader>
-                <CardTitle>Create Account</CardTitle>
-                <CardDescription>
-                  The Create Account authority is only applicable to Admin
-                  Only..!
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="fullname">Fullname</Label>
-                  <Input
-                    id="fullname"
-                    name="fullname"
-                    placeholder="Enter your Fullname"
-                    onChange={handleOnChange}
-                    value={data.fullname}
-                    disabled={loading}
-                    required
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    name="username"
-                    placeholder="Enter your Username"
-                    onChange={handleOnChange}
-                    value={data.username}
-                    disabled={loading}
-                    required
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    placeholder="Enter your Email"
-                    onChange={handleOnChange}
-                    value={data.email}
-                    disabled={loading}
-                    required
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
+            <TabsContent value="SignUp">
+              <Card className="w-90">
+                <CardHeader>
+                  <CardTitle>Create Account</CardTitle>
+                  <CardDescription>
+                    The Create Account authority is only applicable to Admin
+                    Only..!
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-6">
+                  <div className="grid gap-3">
+                    <Label htmlFor="fullname">Fullname</Label>
                     <Input
-                      type={passwordVisible? "text":"password"}
-                      id="password"
-                      name="password"
-                      placeholder="Enter your Password"
+                      id="fullname"
+                      name="fullname"
+                      placeholder="Enter your Fullname"
                       onChange={handleOnChange}
-                      value={data.password}
+                      value={data.fullname}
                       disabled={loading}
-                      className="pr-10"
                       required
                     />
-                    <button 
-                      type="button" 
-                      onClick={() => setPasswordVisible(!passwordVisible)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors"
-                      disabled={loading}
-                      tabIndex={-1}
-                    >
-                      {passwordVisible? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
                   </div>
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <div className="relative">
+                  <div className="grid gap-3">
+                    <Label htmlFor="username">Username</Label>
                     <Input
-                      type={confirmPasswordVisible? "text" : "password"}
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      placeholder="Enter your Password Again"
+                      id="username"
+                      name="username"
+                      placeholder="Enter your Username"
                       onChange={handleOnChange}
-                      value={data.confirmPassword}
+                      value={data.username}
                       disabled={loading}
-                      className="pr-10"
                       required
                     />
-                    <button 
-                      type="button" 
-                      onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors"
-                      disabled={loading}
-                      tabIndex={-1}
-                    >
-                      {confirmPasswordVisible? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
                   </div>
+                  <div className="grid gap-3">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      placeholder="Enter your Email"
+                      onChange={handleOnChange}
+                      value={data.email}
+                      disabled={loading}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-3">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Input
+                        type={passwordVisible ? "text" : "password"}
+                        id="password"
+                        name="password"
+                        placeholder="Enter your Password"
+                        onChange={handleOnChange}
+                        value={data.password}
+                        disabled={loading}
+                        className="pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPasswordVisible(!passwordVisible)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors"
+                        disabled={loading}
+                        tabIndex={-1}
+                      >
+                        {passwordVisible ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid gap-3">
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <div className="relative">
+                      <Input
+                        type={confirmPasswordVisible ? "text" : "password"}
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        placeholder="Enter your Password Again"
+                        onChange={handleOnChange}
+                        value={data.confirmPassword}
+                        disabled={loading}
+                        className="pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setConfirmPasswordVisible(!confirmPasswordVisible)
+                        }
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors"
+                        disabled={loading}
+                        tabIndex={-1}
+                      >
+                        {confirmPasswordVisible ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </CardContent>
+                <div className="flex justify-center items-center">
+                  <Button
+                    type="submit"
+                    className="w-2xs cursor-pointer"
+                    disabled={loading}
+                  >
+                    {loading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    {loading ? "Creating Account..." : "Create Account"}
+                  </Button>
                 </div>
-              </CardContent>
-              <div className="flex justify-center items-center">
-                <Button type="submit" className="w-2xs cursor-pointer" disabled={loading}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {loading ? "Creating Account..." : "Create Account"}    
-                </Button>
-              </div>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </form>   : 
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">You are already logged in</h1>
-          <p className="text-gray-600">Redirecting to dashboard...</p>
-          {setTimeout(() => {
-            navigate("/voter/dashboard")
-          })}
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </form>
+      ) : (
+        <div className="flex justify-center items-center h-screen">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">
+              You are already logged in
+            </h1>
+            <p className="text-gray-600">Redirecting to dashboard...</p>
+            {setTimeout(() => {
+              navigate("/voter/dashboard");
+            })}
+          </div>
         </div>
-      </div>
-      }
+      )}
     </div>
   );
 };
