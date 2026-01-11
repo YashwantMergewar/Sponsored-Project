@@ -99,7 +99,7 @@ const RegisterVoterPage = () => {
 
       if (ageNumber === undefined || Number.isNaN(ageNumber) || ageNumber < 18) {
         setLoading(false);
-        toast.error("Please select a valid Date of Birth (age must be >= 18)");
+        toast.error("Please select a valid Date of Birth (age must be 18 or above 18)");
         return;
       }
 
@@ -116,7 +116,7 @@ const RegisterVoterPage = () => {
         prabhag_no: prabhagNumber,
       };
 
-      const validData = voterRegistrationSchema(submittedData)
+      const validData = voterRegistrationSchema.parse(submittedData)
 
       const voter = await registerVoter(validData);
       setData({
@@ -139,7 +139,7 @@ const RegisterVoterPage = () => {
       navigate("/voter/dashboard");
       toast.success(voter?.message || "Voter registered successfully");
     } catch (error) {
-      toast.error(err?.issues?.[0]?.message || error.message || "Voter registration failed");
+      toast.error(error?.issues?.[0]?.message || error.message || "Voter registration failed");
       console.log(error.message);
     } finally {
       setLoading(false);
