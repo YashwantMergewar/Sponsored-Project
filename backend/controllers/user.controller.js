@@ -36,13 +36,6 @@ const registerUser = asyncHandler(async (req, res) => {
         return res.status(401).json({message: "username or email is required..!"})
     }
 
-    const [existingUsers] = await conn.query('select * from users where username = ? or email = ?', [username, email])
-
-    if(existingUsers.length > 0){
-        return res.status(409).json({
-            message: "User with given username or email already exists..!"
-        })
-    }
 
     if(!password){
         return res.status(401).json({message: "password is required..!"})
