@@ -55,6 +55,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const columnHelper = createColumnHelper();
 // Columns are defined inside the Dashboard component so action handlers can access component state (setVoters) and helpers.
@@ -321,6 +322,7 @@ const Dashboard = () => {
                             )}
                           </TableCell>
                         ))}
+                        
                       </TableRow>
                     ))
                   ) : (

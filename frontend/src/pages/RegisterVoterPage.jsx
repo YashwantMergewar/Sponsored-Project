@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/context/AuthContext";
+import { voterRegistrationSchema } from "@/validationSchema/voterConstraintsSchema";
 import { format } from "date-fns";
 import { Calendar1Icon, Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -115,7 +116,9 @@ const RegisterVoterPage = () => {
         prabhag_no: prabhagNumber,
       };
 
-      const voter = await registerVoter(submittedData);
+      const validData = voterRegistrationSchema(submittedData)
+
+      const voter = await registerVoter(validData);
       setData({
         fullname: "",
         email: "",
@@ -136,7 +139,7 @@ const RegisterVoterPage = () => {
       navigate("/voter/dashboard");
       toast.success(voter?.message || "Voter registered successfully");
     } catch (error) {
-      toast.error(error.message || "Voter registration failed");
+      toast.error(err?.issues?.[0]?.message || error.message || "Voter registration failed");
       console.log(error.message);
     } finally {
       setLoading(false);
